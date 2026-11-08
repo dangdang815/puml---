@@ -13,56 +13,56 @@ actor 系统管理员
 
 rectangle "酒店管理系统" {
   package "客房预订子系统" {
-    usecase "查询房态与房价" as UC001
-    usecase "预订客房" as UC002
-    usecase "取消预订" as UC003
+    usecase "查询房态与房价" as UC01
+    usecase "预订客房" as UC02
+    usecase "取消预订" as UC03
   }
   package "前台接待子系统" {
-    usecase "办理入住登记" as UC005
-    usecase "办理退房结算" as UC006
-    usecase "换房" as UC007
-    usecase "续住" as UC008
+    usecase "办理入住登记" as UC04
+    usecase "办理退房结算" as UC05
+    usecase "换房" as UC06
+    usecase "续住" as UC07
   }
   package "客房管理子系统" {
-    usecase "房态查询与维护" as UC010
-    usecase "清洁登记" as UC011
-    usecase "维修报障与恢复" as UC012
+    usecase "房态查询与维护" as UC08
+    usecase "清洁登记" as UC09
+    usecase "维修报障与恢复" as UC10
   }
   package "会员管理子系统" {
-    usecase "会员注册" as UC013
-    usecase "会员信息维护" as UC014
+    usecase "会员注册" as UC11
+    usecase "会员信息维护" as UC12
   }
   package "系统管理子系统" {
-    usecase "用户登录与登出" as UC016
-    usecase "用户与权限管理" as UC017
-    usecase "房型与房价维护" as UC018
-    usecase "经营报表统计" as UC019
+    usecase "用户登录与登出" as UC13
+    usecase "用户与权限管理" as UC14
+    usecase "房型与房价维护" as UC15
+    usecase "经营报表统计" as UC16
   }
 }
 
-顾客 --> UC001
-顾客 --> UC002
-顾客 --> UC003
-顾客 --> UC013
-顾客 --> UC016
-前台接待员 --> UC005
-前台接待员 --> UC006
-前台接待员 --> UC007
-前台接待员 --> UC008
-前台接待员 --> UC016
-客房服务员 --> UC010
-客房服务员 --> UC011
-客房部主管 --> UC010
-客房部主管 --> UC012
-客房部主管 --> UC016
-财务人员 --> UC016
-财务人员 --> UC019
-系统管理员 --> UC016
-系统管理员 --> UC017
-系统管理员 --> UC018
-系统管理员 --> UC019
+顾客 --> UC01
+顾客 --> UC02
+顾客 --> UC03
+顾客 --> UC11
+顾客 --> UC13
+前台接待员 --> UC04
+前台接待员 --> UC05
+前台接待员 --> UC06
+前台接待员 --> UC07
+前台接待员 --> UC13
+客房服务员 --> UC08
+客房服务员 --> UC09
+客房部主管 --> UC08
+客房部主管 --> UC10
+客房部主管 --> UC13
+财务人员 --> UC13
+财务人员 --> UC16
+系统管理员 --> UC13
+系统管理员 --> UC14
+系统管理员 --> UC15
+系统管理员 --> UC16
 
-UC002 ..> UC001 : <<include>>
-UC005 ..> UC001 : <<include>>
-UC010 ..> UC001 : <<include>>
+UC02 ..> UC01 : <<include>>
+UC04 ..> UC01 : <<include>>
+UC08 ..> UC01 : <<include>>
 @enduml
