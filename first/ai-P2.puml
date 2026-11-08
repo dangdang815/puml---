@@ -1,0 +1,260 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+' ========== 核心类 ==========
+class Guest {
+  - guestId: String
+  - name: String
+  - phone: String
+  - idCardNo: String
+  - email: String
+  + createReservation(roomType: RoomType, checkIn: Date, checkOut: Date): Reservation
+  + queryReservations(): List
+  + queryStayRecords(): List
+}
+
+class Member {
+  - memberNo: String
+  - level: MemberLevel
+  - points: int
+  - joinDate: Date
+  + accumulatePoints(amount: BigDecimal): void
+  + redeemPoints(points: int): boolean
+  + upgradeLevel(): void
+}
+
+Guest <|-- Member
+
+class RoomType {
+  - typeId: String
+  - typeName: String
+  - bedType: String
+  - area: double
+  - basePrice: BigDecimal
+  - maxOccupancy: int
+  - description: String
+  + getAvailableRooms(checkIn: Date, checkOut: Date): List
+  + calculatePrice(nights: int): BigDecimal
+}
+
+class Room {
+  - roomNo: String
+  - floor: int
+  - status: RoomStatus
+  - cleanStatus: CleanStatus
+  - isSmoking: boolean
+  + isAvailable(): boolean
+  + updateStatus(newStatus: RoomStatus, operator: Employee): RoomStatusLog
+  + assignCleaner(cleaner: Employee, cleanType: CleanType): CleaningRecord
+  + reportRepair(description: String, reporter: Employee): RepairOrder
+}
+
+class Reservation {
+  - reservationId: String
+  - checkInDate: Date
+  - checkOutDate: Date
+  - roomCount: int
+  - guestCount: int
+  - status: ReservationStatus
+  - deposit: BigDecimal
+  - createdAt: DateTime
+  + confirm(): void
+  + cancel(): void
+  + modify(checkIn: Date, checkOut: Date, roomType: RoomType): void
+  + toStayRecord(room: Room, receptionist: Employee): StayRecord
+}
+
+class StayRecord {
+  - stayId: String
+  - actualCheckInTime: DateTime
+  - actualCheckOutTime: DateTime
+  - guestCount: int
+  - status: StayStatus
+  + checkOut(): Bill
+  + changeRoom(newRoom: Room): void
+  + extendStay(newCheckOut: Date): void
+}
+
+class Bill {
+  - billId: String
+  - billType: BillType
+  - totalAmount: BigDecimal
+  - paidAmount: BigDecimal
+  - status: BillStatus
+  - createdAt: DateTime
+  + addItem(item: BillItem): void
+  + calculateTotal(): BigDecimal
+  + settle(paymentMethod: String): void
+  + refund(amount: BigDecimal): void
+  + printInvoice(): void
+}
+
+class BillItem {
+  - itemId: String
+  - itemType: BillItemType
+  - description: String
+  - quantity: int
+  - unitPrice: BigDecimal
+  - amount: BigDecimal
+  + getAmount(): BigDecimal
+}
+
+class Employee {
+  - empId: String
+  - name: String
+  - role: EmployeeRole
+  - phone: String
+  - status: String
+  + login(): boolean
+  + hasPermission(permission: String): boolean
+}
+
+class RoomStatusLog {
+  - logId: String
+  - oldStatus: RoomStatus
+  - newStatus: RoomStatus
+  - changeTime: DateTime
+  - remark: String
+  + record(room: Room, oldStatus: RoomStatus, newStatus: RoomStatus, operator: Employee): void
+}
+
+class CleaningRecord {
+  - cleanId: String
+  - cleanType: CleanType
+  - startTime: DateTime
+  - endTime: DateTime
+  - status: CleanStatus
+  - remark: String
+  + start(): void
+  + complete(): void
+}
+
+class RepairOrder {
+  - repairId: String
+  - description: String
+  - reportTime: DateTime
+  - repairTime: DateTime
+  - status: RepairStatus
+  - cost: BigDecimal
+  + assign(employee: Employee): void
+  + complete(cost: BigDecimal): void
+}
+
+' ========== 枚举 ==========
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  CLEANING
+  MAINTENANCE
+  OUT_OF_ORDER
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  CHECKED_IN
+  NO_SHOW
+}
+
+enum StayStatus {
+  CHECKED_IN
+  CHECKED_OUT
+}
+
+enum BillStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+  REFUNDED
+}
+
+enum BillType {
+  DEPOSIT
+  SETTLEMENT
+  REFUND
+}
+
+enum BillItemType {
+  ROOM_FEE
+  DEPOSIT
+  FOOD
+  DAMAGE
+  OTHER
+}
+
+enum EmployeeRole {
+  RECEPTIONIST
+  ROOM_ATTENDANT
+  HOUSEKEEPING_SUPERVISOR
+  FINANCE
+  ADMIN
+}
+
+enum MemberLevel {
+  NORMAL
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum CleanType {
+  CHECKOUT
+  DAILY
+  DEEP
+}
+
+enum CleanStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum RepairStatus {
+  REPORTED
+  ASSIGNED
+  REPAIRING
+  COMPLETED
+  CLOSED
+}
+
+' ========== 关系 ==========
+Guest "1" -- "0..*" Reservation : 发起预订
+RoomType "1" -- "0..*" Room : 包含
+Reservation "0..*" --> "1" RoomType : 预订房型
+Reservation "0..1" -- "0..1" StayRecord : 转为入住
+StayRecord "0..*" --> "1" Guest : 入住客人
+StayRecord "0..*" --> "1" Room : 分配房间
+StayRecord "0..*" --> "0..1" Reservation : 来源预订
+StayRecord "1" -- "0..*" Bill : 产生账单
+Bill "1" *-- "1..*" BillItem : 包含明细
+Bill "0..*" --> "0..1" Employee : 收银员
+StayRecord "0..*" --> "0..1" Employee : 接待员
+Reservation "0..*" --> "0..1" Employee : 处理人
+
+Room "1" -- "0..*" RoomStatusLog : 状态变更日志
+RoomStatusLog "0..*" --> "0..1" Employee : 操作人
+Room "1" -- "0..*" CleaningRecord : 清洁任务
+CleaningRecord "0..*" --> "1" Employee : 清洁员
+Room "1" -- "0..*" RepairOrder : 维修单
+RepairOrder "0..*" --> "0..1" Employee : 处理人
+
+' ========== 说明 ==========
+note right of Reservation
+  预订阶段关联房型；
+  入住阶段再分配具体房间。
+end note
+
+note right of BillItem
+  明细金额 = 数量 × 单价；
+  账单总额由账单明细汇总。
+end note
+
+note bottom of RoomStatusLog
+  记录房态变更前后状态及操作人，
+  支撑房态主流程审计与追踪。
+end note
+
+@enduml

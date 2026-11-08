@@ -1,0 +1,171 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+' ========== 类 ==========
+class Guest {
+  - guestId: String
+  - name: String
+  - phone: String
+  - idCardNo: String
+  - email: String
+  + createReservation(roomType: RoomType, checkIn: Date, checkOut: Date): Reservation
+  + queryReservations(): List
+  + queryStayRecords(): List
+}
+
+class Member {
+  - memberNo: String
+  - level: String
+  - points: int
+  - joinDate: Date
+  + accumulatePoints(amount: BigDecimal): void
+  + redeemPoints(points: int): boolean
+  + upgradeLevel(): void
+}
+
+class RoomType {
+  - typeId: String
+  - typeName: String
+  - bedType: String
+  - area: double
+  - basePrice: BigDecimal
+  - maxOccupancy: int
+  - description: String
+  + getAvailableRooms(checkIn: Date, checkOut: Date): List
+  + calculatePrice(nights: int): BigDecimal
+}
+
+class Room {
+  - roomNo: String
+  - floor: int
+  - status: String
+  - cleanStatus: String
+  - isSmoking: boolean
+  + isAvailable(): boolean
+  + updateStatus(newStatus: String, operator: Employee): RoomStatusLog
+  + assignCleaner(cleaner: Employee, cleanType: String): CleaningRecord
+  + reportRepair(description: String, reporter: Employee): RepairOrder
+}
+
+class Reservation {
+  - reservationId: String
+  - checkInDate: Date
+  - checkOutDate: Date
+  - roomCount: int
+  - guestCount: int
+  - status: String
+  - deposit: BigDecimal
+  - createdAt: DateTime
+  + confirm(): void
+  + cancel(): void
+  + modify(checkIn: Date, checkOut: Date, roomType: RoomType): void
+  + toStayRecord(room: Room, receptionist: Employee): StayRecord
+}
+
+class StayRecord {
+  - stayId: String
+  - actualCheckInTime: DateTime
+  - actualCheckOutTime: DateTime
+  - guestCount: int
+  - status: String
+  + checkOut(): Bill
+  + changeRoom(newRoom: Room): void
+  + extendStay(newCheckOut: Date): void
+}
+
+class Bill {
+  - billId: String
+  - billType: String
+  - totalAmount: BigDecimal
+  - paidAmount: BigDecimal
+  - status: String
+  - createdAt: DateTime
+  + addItem(item: BillItem): void
+  + calculateTotal(): BigDecimal
+  + settle(paymentMethod: String): void
+  + refund(amount: BigDecimal): void
+  + printInvoice(): void
+}
+
+class BillItem {
+  - itemId: String
+  - itemType: String
+  - description: String
+  - quantity: int
+  - unitPrice: BigDecimal
+  - amount: BigDecimal
+  + getAmount(): BigDecimal
+}
+
+class Employee {
+  - empId: String
+  - name: String
+  - role: String
+  - phone: String
+  - status: String
+  + login(): boolean
+  + hasPermission(permission: String): boolean
+}
+
+class RoomStatusLog {
+  - logId: String
+  - oldStatus: String
+  - newStatus: String
+  - changeTime: DateTime
+  - remark: String
+  + record(room: Room, oldStatus: String, newStatus: String, operator: Employee): void
+}
+
+class CleaningRecord {
+  - cleanId: String
+  - cleanType: String
+  - startTime: DateTime
+  - endTime: DateTime
+  - status: String
+  - remark: String
+  + start(): void
+  + complete(): void
+}
+
+class RepairOrder {
+  - repairId: String
+  - description: String
+  - reportTime: DateTime
+  - repairTime: DateTime
+  - status: String
+  - cost: BigDecimal
+  + assign(employee: Employee): void
+  + complete(cost: BigDecimal): void
+}
+
+' ========== 关系 ==========
+' 泛化：子类 Member 指向父类 Guest
+Guest <|-- Member : 继承
+
+' 聚合/组合：菱形在整体端
+RoomType "1" o-- "0..*" Room : 包含
+Bill "1" *-- "1..*" BillItem : 包含
+
+' 单向关联：箭头从主动方指向被动方，标签均为动词
+Guest "1" --> "0..*" Reservation : 发起
+Reservation "0..*" --> "1" RoomType : 预订
+Reservation "0..1" --> "0..1" StayRecord : 转为入住
+StayRecord "0..*" --> "1" Guest : 登记
+StayRecord "0..*" --> "1" Room : 分配
+StayRecord "1" --> "0..*" Bill : 产生
+
+Employee "0..*" --> "0..*" Reservation : 处理
+Employee "0..*" --> "0..*" StayRecord : 办理
+Employee "0..*" --> "0..*" Bill : 结算
+
+Room "1" --> "0..*" RoomStatusLog : 产生
+Employee "0..*" --> "0..*" RoomStatusLog : 记录
+
+Room "1" --> "0..*" CleaningRecord : 安排清洁
+Employee "0..*" --> "0..*" CleaningRecord : 执行
+
+Room "1" --> "0..*" RepairOrder : 报修
+Employee "0..*" --> "0..*" RepairOrder : 处理
+
+@enduml

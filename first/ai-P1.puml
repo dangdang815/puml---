@@ -1,0 +1,99 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "顾客" as Customer
+actor "前台接待员" as Receptionist
+actor "客房服务员" as RoomAttendant
+actor "客房部主管" as HousekeepingSupervisor
+actor "财务人员" as Finance
+actor "系统管理员" as SysAdmin
+
+rectangle "酒店管理系统" {
+
+  rectangle "客房预订子系统" {
+    usecase "查询房型与房价" as UC_QueryRoom
+    usecase "在线预订客房" as UC_BookRoom
+    usecase "修改/取消预订" as UC_ModifyCancelBooking
+    usecase "预订确认" as UC_ConfirmBooking
+  }
+
+  rectangle "前台接待子系统" {
+    usecase "办理入住" as UC_CheckIn
+    usecase "办理退房" as UC_CheckOut
+    usecase "换房/续住" as UC_ChangeOrExtendRoom
+    usecase "账单结算" as UC_SettleBill
+    usecase "发票/退款处理" as UC_InvoiceRefund
+  }
+
+  rectangle "客房管理子系统" {
+    usecase "查看清洁任务" as UC_ViewCleaningTask
+    usecase "更新房态" as UC_UpdateRoomStatus
+    usecase "客房报修" as UC_ReportRepair
+    usecase "分配清洁任务" as UC_AssignCleaningTask
+    usecase "审核房态" as UC_AuditRoomStatus
+    usecase "客房检查" as UC_InspectRoom
+    usecase "客房统计" as UC_RoomStatistics
+  }
+
+  rectangle "会员管理子系统" {
+    usecase "会员注册" as UC_RegisterMember
+    usecase "会员信息维护" as UC_MaintainMember
+    usecase "查询会员积分/等级" as UC_QueryMemberPoint
+    usecase "积分管理" as UC_ManagePoint
+    usecase "会员等级管理" as UC_ManageMemberLevel
+  }
+
+  rectangle "系统管理子系统" {
+    usecase "用户与权限管理" as UC_UserPermission
+    usecase "系统参数配置" as UC_SystemConfig
+    usecase "日志审计" as UC_LogAudit
+    usecase "数据备份与恢复" as UC_BackupRestore
+  }
+
+  usecase "财务对账与报表" as UC_FinanceReport
+}
+
+' 顾客
+Customer --> UC_QueryRoom
+Customer --> UC_BookRoom
+Customer --> UC_ModifyCancelBooking
+Customer --> UC_RegisterMember
+Customer --> UC_QueryMemberPoint
+
+' 前台接待员
+Receptionist --> UC_ConfirmBooking
+Receptionist --> UC_CheckIn
+Receptionist --> UC_CheckOut
+Receptionist --> UC_ChangeOrExtendRoom
+Receptionist --> UC_SettleBill
+Receptionist --> UC_RegisterMember
+Receptionist --> UC_MaintainMember
+Receptionist --> UC_QueryMemberPoint
+Receptionist --> UC_ManagePoint
+Receptionist --> UC_ManageMemberLevel
+
+' 客房服务员
+RoomAttendant --> UC_ViewCleaningTask
+RoomAttendant --> UC_UpdateRoomStatus
+RoomAttendant --> UC_ReportRepair
+
+' 客房部主管
+HousekeepingSupervisor --> UC_AssignCleaningTask
+HousekeepingSupervisor --> UC_AuditRoomStatus
+HousekeepingSupervisor --> UC_InspectRoom
+HousekeepingSupervisor --> UC_RoomStatistics
+
+' 财务人员
+Finance --> UC_SettleBill
+Finance --> UC_InvoiceRefund
+Finance --> UC_FinanceReport
+
+' 系统管理员
+SysAdmin --> UC_UserPermission
+SysAdmin --> UC_SystemConfig
+SysAdmin --> UC_LogAudit
+SysAdmin --> UC_BackupRestore
+
+@enduml
