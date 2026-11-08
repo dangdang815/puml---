@@ -1,0 +1,26 @@
+@startuml seq_booking
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam sequenceMessageAlign center
+autonumber
+
+actor 顾客
+participant "前台界面" as UI
+participant "预订服务" as RS
+participant "客房数据" as RD
+participant "预订单数据" as RVD
+
+顾客 -> UI : 提交预订请求\n（房型、入住/离店日期、间数）
+UI -> RS : 查询可售房（房型、日期、间数）
+RS -> RD : 查询指定日期房态
+RD --> RS : 可售房清单
+RS --> UI : 返回可售房型与房价
+UI -> 顾客 : 显示可售房型、房价
+顾客 -> UI : 确认预订并填写客人信息
+UI -> RS : 创建预订单（客人信息、房间要求）
+RS -> RVD : 保存预订单
+RVD --> RS : 返回预订单号
+RS -> RD : 预占房间（房态置为“已预订”）
+RS --> UI : 预订成功、预订单号
+UI -> 顾客 : 显示预订结果与保留时间
+@enduml

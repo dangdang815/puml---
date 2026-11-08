@@ -1,0 +1,15 @@
+@startuml state_room
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam stateFontSize 13
+[*] --> 空净
+空净 --> 已预订 : 确认预订（保留房间）\n或现场预订
+已预订 --> 已入住 : 办理入住登记
+已预订 --> 空净 : 取消预订\n或逾期未到店（No-show）
+已入住 --> 脏房 : 办理退房
+已入住 --> 已入住 : 续住
+已入住 --> 维修 : 在住期间报障\n（换房后维修）
+脏房 --> 空净 : 清洁完成、\n检查合格
+脏房 --> 维修 : 检查发现\n设施故障
+维修 --> 空净 : 维修完成、\n验收合格
+@enduml

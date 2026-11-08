@@ -1,0 +1,31 @@
+@startuml act_checkout
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam activityFontSize 13
+
+|前台接待员|
+start
+:核对客人身份与入住信息;
+
+|系统|
+:查询在住记录、押金与消费账单;
+:汇总生成退房账单明细\n（房费、餐费、其他消费）;
+|前台接待员|
+if (客人对账单有异议？) then (是)
+  |前台接待员|
+  :与客人核对并修正账单;
+  |系统|
+  :重新生成账单明细;
+  detach
+else (否)
+  |前台接待员|
+  :收取应付款项或办理押金结算;
+  |系统|
+  :更新账单状态为“已结算”;
+  :更新入住单状态为“已退房”;
+  :将客房状态置为“脏房”，\n通知客房部清洁;
+  |前台接待员|
+  :打印结算单并交还证件;
+  stop
+endif
+@enduml

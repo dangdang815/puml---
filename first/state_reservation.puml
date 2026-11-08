@@ -1,0 +1,12 @@
+@startuml state_reservation
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam stateFontSize 13
+[*] --> 待确认 : 顾客提交预订申请
+待确认 --> 已确认 : 前台核对信息并确认\n（可保留房间至规定时间）
+待确认 --> 已取消 : 顾客取消
+已确认 --> 已入住 : 到店办理入住登记
+已确认 --> 已取消 : 顾客取消\n或逾期未到店（No-show）
+已入住 --> 已完成 : 退房结算完成
+已完成 --> [*]
+@enduml

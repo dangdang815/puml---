@@ -1,0 +1,29 @@
+@startuml seq_checkin
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam sequenceMessageAlign center
+autonumber
+
+actor 前台接待员
+participant "前台界面" as UI
+participant "入住服务" as CS
+participant "预订单数据" as RVD
+participant "客房数据" as RD
+participant "入住单数据" as SD
+participant "账单数据" as BD
+
+前台接待员 -> UI : 查询预订单\n（预订号/姓名/电话）
+UI -> CS : 查询预订单信息
+CS -> RVD : 查询预订单
+RVD --> CS : 预订单（已确认）
+CS -> RD : 分配房间并锁定
+RD --> CS : 房间号
+CS --> UI : 显示房间与押金要求
+前台接待员 -> UI : 录入押金并确认入住
+UI -> CS : 办理入住（客人、房间、押金）
+CS -> SD : 创建入住单
+CS -> BD : 创建押金账单
+CS -> RVD : 更新预订单状态为“已入住”
+CS --> UI : 入住登记成功
+UI -> 前台接待员 : 打印入住凭条
+@enduml
