@@ -1,0 +1,64 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam defaultFontName "Microsoft YaHei"
+skinparam monochrome false
+title 酒店管理系统 开发视图——包图
+
+package "表示层 UI（Vue3 前端页面）" as ui {
+  [登录与权限页面]
+  [预订与前台页面]
+  [房态管理页面]
+  [会员与系统管理页面]
+}
+
+package "Web 控制层（REST Controller）" as web {
+  [AuthController]
+  [ReservationController]
+  [FrontDeskController]
+  [RoomController]
+  [MemberController]
+  [ReportController]
+}
+
+package "业务逻辑层（Service）" as svc {
+  package "客房预订子系统" {
+    [预订服务]
+  }
+  package "前台接待子系统" {
+    [入住退房服务]
+  }
+  package "客房管理子系统" {
+    [房态服务]
+  }
+  package "会员管理子系统" {
+    [会员服务]
+  }
+  package "系统管理子系统" {
+    [用户权限服务]
+    [报表服务]
+  }
+}
+
+package "数据访问层（DAO / MyBatis Mapper）" as dao {
+  [GuestMapper]
+  [RoomMapper]
+  [ReservationMapper]
+  [StayRecordMapper]
+  [BillMapper]
+  [EmployeeMapper]
+}
+
+package "领域模型（PO）" as domain {
+  [Guest/Member]
+  [Room/RoomType]
+  [Reservation/StayRecord]
+  [Bill/BillItem]
+  [Employee/Role]
+}
+
+ui --> web
+web --> svc
+svc --> dao
+svc ..> domain
+dao ..> domain
+@enduml

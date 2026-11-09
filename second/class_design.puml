@@ -1,0 +1,69 @@
+@startuml class_design
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam packageStyle rectangle
+skinparam classFontSize 11
+
+package "表示层（controller）" {
+  class LoginController
+  class ReservationController
+  class CheckInController
+  class CheckOutController
+  class RoomStatusController
+  class MemberController
+}
+
+package "业务层（service）" {
+  class AuthService
+  class ReservationService
+  class CheckInService
+  class SettlementService
+  class RoomStatusService
+  class MemberService
+}
+
+package "数据访问层（dao）" {
+  class GuestMapper
+  class RoomMapper
+  class ReservationMapper
+  class StayRecordMapper
+  class BillMapper
+  class MemberMapper
+}
+
+package "实体与领域对象（entity）" {
+  class Guest
+  class Member
+  class Room
+  class RoomType
+  class Reservation
+  class StayRecord
+  class Bill
+  class BillItem
+}
+
+LoginController ..> AuthService
+ReservationController ..> ReservationService
+CheckInController ..> CheckInService
+CheckOutController ..> SettlementService
+RoomStatusController ..> RoomStatusService
+MemberController ..> MemberService
+
+AuthService ..> GuestMapper
+ReservationService ..> ReservationMapper
+ReservationService ..> RoomMapper
+CheckInService ..> StayRecordMapper
+CheckInService ..> ReservationMapper
+SettlementService ..> BillMapper
+RoomStatusService ..> RoomMapper
+MemberService ..> MemberMapper
+
+GuestMapper ..> Guest
+RoomMapper ..> Room
+RoomMapper ..> RoomType
+ReservationMapper ..> Reservation
+StayRecordMapper ..> StayRecord
+BillMapper ..> Bill
+BillMapper ..> BillItem
+MemberMapper ..> Member
+@enduml
