@@ -1,0 +1,25 @@
+@startuml uc_housekeeping
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam usecaseFontSize 13
+left to right direction
+
+actor 客房服务员
+actor 客房部主管
+
+package "客房管理子系统" {
+  usecase "查询房态" as UC01
+  usecase "房态查询与维护" as UC08
+  usecase "清洁登记" as UC09
+  usecase "维修报障与恢复" as UC10
+}
+
+客房服务员 --> UC08
+客房服务员 --> UC09
+客房部主管 --> UC08
+客房部主管 --> UC10
+
+UC08 ..> UC01 : <<include>>
+UC09 ..> UC08 : <<extend>>
+UC10 ..> UC08 : <<extend>>
+@enduml
