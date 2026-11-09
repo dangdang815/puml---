@@ -1,0 +1,73 @@
+@startuml
+skinparam deploymentDiagram {
+  defaultFontName "Microsoft YaHei"
+}
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+node "客户端" as ClientNode {
+  artifact "Vue3 SPA\n浏览器（PC/移动）" as Browser
+}
+
+node "Web服务器" as WebNode {
+  component "Nginx\nHTTPS终止\nVue3静态资源\n反向代理 + 负载均衡" as Nginx
+}
+
+node "应用服务器1" as App1 {
+  package "Spring Boot 应用实例1" {
+    component "表示层\nREST Controller" as C1
+    component "业务逻辑层\nService（事务/规则）" as S1
+    component "数据访问层\nMyBatis Mapper/DAO" as D1
+  }
+}
+
+node "应用服务器2" as App2 {
+  package "Spring Boot 应用实例2" {
+    component "表示层\nREST Controller" as C2
+    component "业务逻辑层\nService（事务/规则）" as S2
+    component "数据访问层\nMyBatis Mapper/DAO" as D2
+  }
+}
+
+node "缓存服务器" as CacheNode {
+  database "Redis\n会话共享\n热点房态/房价缓存\n分布式锁" as Redis
+}
+
+node "数据库服务器" as DbNode {
+  database "MySQL 8.0 主库\n写 / 事务 / 行锁" as Master
+  database "MySQL 8.0 从库\n读 / 报表查询" as Slave
+}
+
+Browser --> Nginx : HTTPS
+Nginx --> C1 : HTTPS/REST\n负载均衡
+Nginx --> C2 : HTTPS/REST\n负载均衡
+
+C1 --> S1 : 本地调用
+S1 --> D1 : 本地调用
+C2 --> S2 : 本地调用
+S2 --> D2 : 本地调用
+
+D1 --> Master : JDBC 写/事务
+D1 --> Slave : JDBC 只读
+D2 --> Master : JDBC 写/事务
+D2 --> Slave : JDBC 只读
+
+S1 --> Redis : RESP\n会话/缓存/分布式锁
+S2 --> Redis : RESP\n会话/缓存/分布式锁
+
+note right of ClientNode
+  约束：客户端不得直接访问数据库；
+  仅通过 HTTPS 访问 Nginx。
+end note
+
+note bottom of DbNode
+  数据库仅允许应用服务器 JDBC 访问；
+  MyBatis DAO 是唯一数据访问入口。
+end note
+
+note right of CacheNode
+  不超售：按房型+日期加分布式锁，
+  锁内校验库存并预扣，事务提交后释放。
+end note
+
+@enduml
