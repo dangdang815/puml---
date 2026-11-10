@@ -1,0 +1,55 @@
+@startuml
+skinparam deploymentDiagram {
+  defaultFontName "Microsoft YaHei"
+  shadowing false
+}
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+
+node "客户端\n（PC/移动浏览器）" as ClientNode {
+  artifact "Web浏览器\nHTML5/JavaScript" as Browser
+}
+
+node "Web/反向代理服务器" as WebNode {
+  component "Nginx\n静态资源 + HTTPS终止 + 反向代理" as Nginx
+}
+
+node "应用服务器" as AppNode {
+  package "表示层" {
+    component "REST Controller/API\n预订、入住、退房结算、房态、会员、系统管理" as Controller
+  }
+  package "业务逻辑层" {
+    component "Application Service\n业务规则 / 事务 / 权限校验" as Service
+  }
+  package "数据访问层" {
+    component "Repository/DAO\nJDBC实现，唯一数据库访问入口" as DAO
+  }
+}
+
+node "数据库服务器" as DbNode {
+  database "MySQL\n酒店业务数据库" as DB
+}
+
+Browser --> Nginx : HTTPS\n静态资源/API请求
+Nginx --> Controller : HTTPS/REST\n反向代理
+Controller --> Service : 本地方法调用
+Service --> DAO : 本地方法调用
+DAO --> DB : JDBC
+
+note right of ClientNode
+  约束：客户端不得直接访问数据库；
+  仅通过 HTTPS 访问 Nginx/应用。
+end note
+
+note bottom of DbNode
+  数据库仅允许应用服务器访问；
+  DAO 是唯一 JDBC 入口。
+end note
+
+note right of AppNode
+  表示层、业务逻辑层、数据访问层
+  可同机不同包部署，也可按需拆分进程；
+  层间为本地调用，不暴露数据库。
+end note
+
+@enduml
