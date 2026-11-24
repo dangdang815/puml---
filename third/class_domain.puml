@@ -1,0 +1,134 @@
+@startuml class_domain
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam classFontSize 12
+
+class Guest {
+  -guestId : String
+  -name : String
+  -idType : String
+  -idNo : String
+  -phone : String
+  -gender : String
+  -address : String
+}
+
+class Member {
+  -memberNo : String
+  -level : Integer
+  -points : Double
+  -balance : Double
+}
+
+class Employee {
+  -empId : String
+  -name : String
+  -position : String
+  -phone : String
+  -password : String
+}
+
+class RoomType {
+  -typeId : String
+  -typeName : String
+  -basePrice : Double
+  -capacity : Integer
+  -bedType : String
+  -area : Double
+  -description : String
+}
+
+class Room {
+  -roomNo : String
+  -floor : Integer
+  -direction : String
+  -status : String
+  -remark : String
+  +changeStatus(newStatus : String) : Boolean
+}
+
+class RoomStatusLog {
+  -logId : String
+  -oldStatus : String
+  -newStatus : String
+  -changeTime : Date
+  -operator : String
+  -reason : String
+}
+
+class Reservation {
+  -resvId : String
+  -resvNo : String
+  -arriveDate : Date
+  -leaveDate : Date
+  -roomCount : Integer
+  -guestName : String
+  -guestPhone : String
+  -status : String
+  -guarantee : Boolean
+  -createTime : Date
+}
+
+class StayRecord {
+  -stayId : String
+  -stayNo : String
+  -checkInTime : Date
+  -planLeaveTime : Date
+  -checkOutTime : Date
+  -deposit : Double
+  -status : String
+  -remark : String
+}
+
+class Bill {
+  -billId : String
+  -billNo : String
+  -amount : Double
+  -paidAmount : Double
+  -status : String
+  -createTime : Date
+  -settleTime : Date
+}
+
+class BillItem {
+  -itemId : String
+  -itemName : String
+  -itemType : String
+  -quantity : Integer
+  -unitPrice : Double
+  -amount : Double
+  -itemTime : Date
+}
+
+class CleaningRecord {
+  -recordId : String
+  -cleanType : String
+  -cleanTime : Date
+  -cleaner : String
+  -remark : String
+}
+
+class RepairOrder {
+  -repairId : String
+  -faultDesc : String
+  -reportTime : Date
+  -repairMan : String
+  -status : String
+  -finishTime : Date
+}
+
+RoomType "1" -- "0..*" Room : 拥有
+Room "1" -- "0..*" RoomStatusLog : 产生
+Room "1" -- "0..*" StayRecord : 分配
+Room "1" -- "0..*" CleaningRecord : 记录
+Room "1" -- "0..*" RepairOrder : 关联
+Guest "1" -- "0..*" Reservation : 发起
+Guest "1" -- "0..*" StayRecord : 登记
+Guest <|-- Member : 泛化
+Reservation "0..1" -- "0..1" StayRecord : 转化
+StayRecord "1" -- "0..*" Bill : 结算
+Bill "1" -- "1..*" BillItem : 包含
+Employee "1" -- "0..*" StayRecord : 经办
+Employee "1" -- "0..*" CleaningRecord : 执行
+Employee "1" -- "0..*" RepairOrder : 处理
+@enduml

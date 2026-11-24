@@ -1,0 +1,38 @@
+@startuml
+skinparam defaultFontName "Microsoft YaHei"
+title 预订客房场景对象图（示例：会员张伟预订501房）
+
+object "顾客：张伟" as g {
+  姓名 = 张伟
+  电话 = 138****1234
+}
+
+object "会员：张伟" as m {
+  等级 = 银卡
+  积分 = 1200
+}
+
+object "房型：标准大床房" as rt {
+  房价 = 388元/晚
+  面积 = 28㎡
+}
+
+object "客房：501" as r501 {
+  楼层 = 5
+  房态 = 已预订
+}
+
+object "预订单：RS20261103001" as rs {
+  到达日期 = 2026-11-05
+  离店日期 = 2026-11-07
+  状态 = 已确认
+}
+
+object "预订明细：RS20261103001-501" as rr
+
+g ..> m : 会员身份
+rs --> g : 属于
+rs --> rr : 包含
+rr --> r501 : 指向
+r501 --> rt : 属于
+@enduml

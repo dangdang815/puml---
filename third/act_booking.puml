@@ -1,0 +1,29 @@
+@startuml act_booking
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam activityFontSize 13
+
+|顾客|
+start
+:选择房型、入住与离店日期、间数;
+:提交预订请求;
+
+|系统|
+:查询指定日期范围内的可售房;
+if (存在可售房？) then (是)
+  :显示可售房型、房价与房号;
+  |顾客|
+  :确认预订，填写客人信息;
+  |系统|
+  :校验信息并生成预订单;
+  :预占房间（房态置为“已预订”）;
+  :返回预订单号与保留时间;
+  stop
+else (否)
+  |系统|
+  :提示该时段无可用房间;
+  |顾客|
+  :修改房型或日期，重新查询;
+  detach
+endif
+@enduml

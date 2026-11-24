@@ -1,0 +1,23 @@
+@startuml
+skinparam defaultFontName "Microsoft YaHei"
+title 酒店管理系统 体系结构（B/S 三层 + 软件分层）
+
+node "浏览器（Vue3 前端，表示层）" as browser {
+  card "登录/预订/前台/房态/会员/报表页面" as pages
+}
+
+node "应用服务器（Spring Boot 3.2）" as app {
+  package "Web 控制层（REST API）" as web
+  package "业务逻辑层（Service）" as svc
+  package "数据访问层（DAO / MyBatis）" as dao
+}
+
+database "数据库服务器（MySQL 8.0）" as db {
+  card "酒店管理系统数据库" as schema
+}
+
+browser --> app : HTTPS / REST
+web --> svc : 业务调用
+svc --> dao : 持久化访问
+dao --> db : JDBC
+@enduml

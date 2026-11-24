@@ -1,0 +1,24 @@
+@startuml uc_booking
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam usecaseFontSize 13
+left to right direction
+
+actor 顾客
+actor 前台接待员
+
+package "客房预订子系统" {
+  usecase "查询房态与房价" as UC01
+  usecase "预订客房" as UC02
+  usecase "取消预订" as UC03
+
+}
+
+顾客 --> UC01
+顾客 --> UC02
+顾客 --> UC03
+前台接待员 --> UC02
+
+UC02 ..> UC01 : <<include>>
+UC03 ..> UC02 : <<extend>
+@enduml

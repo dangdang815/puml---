@@ -1,0 +1,134 @@
+@startuml
+skinparam defaultFontName "Microsoft YaHei"
+hide circle
+skinparam linetype ortho
+title 酒店管理系统 数据库 E-R 图（核心实体）
+
+entity "顾客 guest" as guest {
+  * guest_id : int <<PK>>
+  --
+  guest_name : varchar
+  id_no : varchar
+  phone : varchar
+}
+
+entity "会员 member" as member {
+  * member_id : int <<PK>>
+  --
+  level : tinyint
+  points : int
+  balance : decimal
+}
+
+entity "房型 room_type" as room_type {
+  * type_id : int <<PK>>
+  --
+  type_name : varchar
+  price : decimal
+}
+
+entity "客房 room" as room {
+  * room_id : int <<PK>>
+  --
+  room_no : varchar
+  floor : tinyint
+  status : tinyint
+}
+
+entity "预订单 reservation" as reservation {
+  * reservation_id : int <<PK>>
+  --
+  arrival_date : date
+  departure_date : date
+  status : tinyint
+}
+
+entity "预订-房间 reservation_room" as rr {
+  * id : int <<PK>>
+  --
+  reservation_id : int <<FK>>
+  room_id : int <<FK>>
+}
+
+entity "入住单 stay_record" as stay {
+  * stay_id : int <<PK>>
+  --
+  checkin_time : datetime
+  checkout_time : datetime
+  deposit : decimal
+  status : tinyint
+}
+
+entity "账单 bill" as bill {
+  * bill_id : int <<PK>>
+  --
+  total_amount : decimal
+  paid_amount : decimal
+  status : tinyint
+}
+
+entity "账单明细 bill_item" as item {
+  * item_id : int <<PK>>
+  --
+  item_name : varchar
+  amount : decimal
+}
+
+entity "员工 employee" as employee {
+  * emp_id : int <<PK>>
+  --
+  emp_name : varchar
+}
+
+entity "角色 role" as role {
+  * role_id : int <<PK>>
+  --
+  role_name : varchar
+}
+
+entity "房态日志 room_status_log" as log {
+  * log_id : int <<PK>>
+  --
+  old_status : tinyint
+  new_status : tinyint
+}
+
+entity "清洁记录 cleaning_record" as clean {
+  * clean_id : int <<PK>>
+  --
+  clean_time : datetime
+}
+
+entity "维修单 repair_order" as repair {
+  * repair_id : int <<PK>>
+  --
+  fault_desc : varchar
+  status : tinyint
+}
+
+' ||--o{ 一对多，||--o| 一对一
+guest ||--o{ reservation:发起
+guest ||--o| member :成为
+
+room_type ||--o{ room :属于
+
+reservation ||--o{ rr :关联
+room ||--o{ rr :被预定关联
+
+reservation ||--o| stay:生成
+room ||--o{ stay
+
+stay ||--o| bill:产生
+bill ||--o{ item:属于
+
+role ||--o{ employee:分配
+
+room ||--o{ log :关联
+employee ||--o{ log:经办
+
+room ||--o{ clean 
+employee ||--o{ clean : 经办
+
+room ||--o{ repair :进行
+employee ||--o{ repair : 维修
+@enduml

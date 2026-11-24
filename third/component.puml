@@ -1,0 +1,48 @@
+@startuml component
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam componentFontSize 12
+
+package "前台管理端（Web）" {
+  component "预订与查询页面" as PG1
+  component "入住/退房页面" as PG2
+  component "房态管理页面" as PG3
+  component "会员管理页面" as PG4
+}
+
+package "业务服务层" {
+  component "预订服务" as S1
+  component "入住服务" as S2
+  component "结算服务" as S3
+  component "房态服务" as S4
+  component "会员服务" as S5
+  component "权限服务" as S6
+}
+
+package "数据访问层" {
+  component "客房数据访问" as DAO1
+  component "预订数据访问" as DAO2
+  component "入住单数据访问" as DAO3
+  component "账单数据访问" as DAO4
+}
+
+database "MySQL 数据库" as MYSQL
+
+PG1 --> S1
+PG1 --> S4
+PG2 --> S2
+PG2 --> S3
+PG3 --> S4
+PG4 --> S5
+S1 --> DAO1
+S1 --> DAO2
+S2 --> DAO3
+S3 --> DAO4
+S4 --> DAO1
+S5 --> DAO3
+S6 --> DAO3
+DAO1 --> MYSQL
+DAO2 --> MYSQL
+DAO3 --> MYSQL
+DAO4 --> MYSQL
+@enduml

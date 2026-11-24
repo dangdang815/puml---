@@ -1,0 +1,37 @@
+@startuml uc_member_admin
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam usecaseFontSize 13
+left to right direction
+
+actor 顾客
+actor 前台接待员
+actor 财务人员
+actor 系统管理员
+
+package "会员管理子系统" {
+  usecase "会员注册" as UC11
+  usecase "会员信息维护" as UC12
+}
+
+package "系统管理子系统" {
+  usecase "用户登录与登出" as UC13
+  usecase "用户与权限管理" as UC14
+  usecase "房型与房价维护" as UC15
+  usecase "经营报表统计" as UC16
+}
+
+顾客 --> UC11
+顾客 --> UC13
+前台接待员 --> UC12
+前台接待员 --> UC13
+财务人员 --> UC13
+财务人员 --> UC16
+系统管理员 --> UC13
+系统管理员 --> UC14
+系统管理员 --> UC15
+系统管理员 --> UC16
+
+UC12 ..> UC11 : <<extend>>
+UC16 ..> UC13 : <<extend>>
+@enduml

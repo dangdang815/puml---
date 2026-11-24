@@ -1,0 +1,26 @@
+@startuml deploy
+skinparam dpi 150
+skinparam defaultFontName "Microsoft YaHei"
+skinparam nodeFontSize 13
+
+node "客户端" {
+  component "浏览器（B/S 表示层）" as WEB
+  component "前台工作站（收银/入住界面）" as WS
+}
+
+node "应用服务器（Tomcat）" {
+  component "表示层控制器（Controller）" as C
+  component "业务层服务（Service）" as S
+  component "数据访问层（DAO/Mapper）" as D
+}
+
+database "数据库服务器" {
+  database "MySQL（酒店业务数据库）" as DB
+}
+
+WEB --> C : HTTP/REST
+WS --> C : HTTP/REST
+C --> S
+S --> D
+D --> DB : JDBC
+@enduml
