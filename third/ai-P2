@@ -1,0 +1,225 @@
+classDiagram
+    class RoomStatus {
+        <<enumeration>>
+        AVAILABLE
+        RESERVED
+        OCCUPIED
+        CLEANING
+        MAINTENANCE
+        OUT_OF_SERVICE
+    }
+
+    class ReservationStatus {
+        <<enumeration>>
+        CREATED
+        CONFIRMED
+        CHECKED_IN
+        CANCELLED
+        NO_SHOW
+        COMPLETED
+    }
+
+    class BillStatus {
+        <<enumeration>>
+        UNPAID
+        PARTIAL_PAID
+        PAID
+        REFUNDED
+        VOID
+    }
+
+    class BillItemType {
+        <<enumeration>>
+        ROOM_FEE
+        DEPOSIT
+        MINIBAR
+        DAMAGE
+        OTHER
+    }
+
+    class EmployeeRole {
+        <<enumeration>>
+        RECEPTIONIST
+        HOUSEKEEPER
+        SUPERVISOR
+        FINANCE
+        ADMIN
+    }
+
+    class MemberLevel {
+        <<enumeration>>
+        NORMAL
+        SILVER
+        GOLD
+        PLATINUM
+    }
+
+    class CleaningStatus {
+        <<enumeration>>
+        PENDING
+        IN_PROGRESS
+        COMPLETED
+    }
+
+    class RepairStatus {
+        <<enumeration>>
+        REPORTED
+        ASSIGNED
+        REPAIRING
+        COMPLETED
+    }
+
+    class Guest {
+        -String guestId
+        -String name
+        -String phone
+        -String idCardNo
+        -String email
+        +createReservation(roomType, checkIn, checkOut) Reservation
+        +cancelReservation(reservationId) boolean
+    }
+
+    class Member {
+        -String memberId
+        -MemberLevel level
+        -int points
+        +accumulatePoints(amount) void
+        +redeemPoints(points) boolean
+    }
+
+    class RoomType {
+        -String typeId
+        -String name
+        -BigDecimal basePrice
+        -int capacity
+        -String description
+        +getPrice(date) BigDecimal
+    }
+
+    class Room {
+        -String roomNo
+        -int floor
+        -RoomStatus status
+        -BigDecimal currentPrice
+        +isAvailable(checkIn, checkOut) boolean
+        +changeStatus(newStatus, operator, remark) void
+    }
+
+    class Reservation {
+        -String reservationId
+        -Date checkInDate
+        -Date checkOutDate
+        -int roomCount
+        -ReservationStatus status
+        -BigDecimal priceSnapshot
+        -BigDecimal deposit
+        +confirm() void
+        +cancel() void
+        +modifyDates(checkIn, checkOut) void
+        +assignRoom(room) void
+    }
+
+    class StayRecord {
+        -String stayId
+        -Date checkInTime
+        -Date checkOutTime
+        -BigDecimal actualPrice
+        -String status
+        +checkIn(room) void
+        +changeRoom(newRoom) void
+        +checkOut() Bill
+    }
+
+    class Bill {
+        -String billId
+        -BigDecimal totalAmount
+        -BigDecimal paidAmount
+        -BillStatus status
+        -Date createdAt
+        +addItem(item) void
+        +getBalance() BigDecimal
+        +settle(paymentMethod) void
+    }
+
+    class BillItem {
+        -String itemId
+        -BillItemType itemType
+        -String description
+        -int quantity
+        -BigDecimal amount
+        +subtotal() BigDecimal
+    }
+
+    class Employee {
+        -String empId
+        -String name
+        -EmployeeRole role
+        -String phone
+        +handleReservation(reservation) void
+        +performCheckIn(stay) void
+        +settleBill(bill) void
+        +updateRoomStatus(room, status) void
+    }
+
+    class RoomStatusLog {
+        -String logId
+        -RoomStatus oldStatus
+        -RoomStatus newStatus
+        -Date changedAt
+        -String remark
+        +toString() String
+    }
+
+    class CleaningRecord {
+        -String cleanId
+        -String cleanType
+        -CleaningStatus status
+        -Date startTime
+        -Date endTime
+        -String remark
+        +complete() void
+    }
+
+    class RepairOrder {
+        -String repairId
+        -String description
+        -RepairStatus status
+        -Date reportedAt
+        -Date completedAt
+        -BigDecimal cost
+        +assign(employee) void
+        +complete() void
+    }
+
+    Guest <|-- Member
+
+    Guest "1" --> "0..*" Reservation : 提交/拥有
+    Reservation "0..*" --> "1" RoomType : 预订房型
+    Reservation "0..*" --> "0..1" Room : 分配客房
+    Employee "1" --> "0..*" Reservation : 处理预订
+
+    StayRecord "1" --> "1" Guest : 入住客人
+    StayRecord "1" --> "1" Room : 入住房间
+    StayRecord "0..*" --> "0..1" Reservation : 关联预订
+    Employee "1" --> "0..*" StayRecord : 办理入住/退房
+
+    Bill "1" --> "1" StayRecord : 结算依据
+    Bill "1" *-- "1..*" BillItem : 包含明细
+    Employee "1" --> "0..*" Bill : 收银结算
+
+    Room "0..*" --> "1" RoomType : 属于房型
+    Room "1" *-- "0..*" RoomStatusLog : 记录状态变更
+    RoomStatusLog "0..*" --> "1" Employee : 操作人
+
+    Room "1" *-- "0..*" CleaningRecord : 清洁任务
+    CleaningRecord "0..*" --> "0..1" Employee : 清洁员
+
+    Room "1" *-- "0..*" RepairOrder : 维修单
+    RepairOrder "0..*" --> "0..1" Employee : 上报/维修人
+
+    note for Reservation "预订时记录房型与房价快照；可分配具体客房，也可在入住时分配。"
+    note for StayRecord "办理入住前需校验 Room.isAvailable；换房时更新 Room 与房态日志。"
+    note for Bill "退房时由 StayRecord.checkOut() 生成账单，并逐项添加 BillItem。"
+    note for RoomStatusLog "记录 oldStatus 到 newStatus，用于追溯房态变化。"
+    note for CleaningRecord "退房后生成清洁任务；清洁完成后房态可置为 AVAILABLE。"
+    note for RepairOrder "维修期间房态置为 MAINTENANCE；维修完成后按清洁结果恢复房态。"
